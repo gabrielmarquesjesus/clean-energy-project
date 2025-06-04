@@ -1,8 +1,9 @@
 'use client'
 
-import { Lead } from "@prisma/client"
+import { LogoutButton } from "@/components/LogoutButton";
+import { Lead } from "@/interfaces/Lead";
 import { useEffect, useState } from "react"
-import { IoCheckboxOutline, IoTrash } from "react-icons/io5";
+import { IoCheckbox, IoCheckboxOutline, IoTrash } from "react-icons/io5";
 
 
 export default function LeadList() {
@@ -41,10 +42,27 @@ export default function LeadList() {
         })
     }
 
+    const handleUpdate = (lead:Lead) => {
+        lead.contacted = !lead.contacted 
+        fetch("/api/lead", {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(lead)
+        }).then(async (response) => {
+            if (response.ok) {
+                refreshList()
+            } else {
+                console.log("Error on update lead", response.status)
+            }
+        }).catch((err) => {
+            console.log("Error on update lead", err)
+        })
+    }
+
     const renderLeadList = leadList.map((lead) =>
         <li key={lead.id} className="list-row flex">
             <div className="w-[45%] border-r-2 border-neutral-400">
-                <div>{lead.name}</div>
+                <div>{lead.name} - {lead.cpf}</div>
                 <div className="text-md font-semibold opacity-60">{lead.email} - {lead.phone}</div>
             </div>
             <div className="w-[45%]">
@@ -52,8 +70,8 @@ export default function LeadList() {
                 <div className="text-md font-semibold opacity-60">Fatura: R${Number(lead.billValue).toFixed(2)}</div>
             </div>
             <div className="w-[10%] flex justify-end">
-                <button className="btn btn-square btn-ghost">
-                    <IoCheckboxOutline size={25}></IoCheckboxOutline>
+                <button data-tip="Contatado" className="btn btn-square btn-ghost tooltip tooltip-top" onClick={()=>handleUpdate(lead)}>
+                    {lead.contacted ? (<IoCheckbox size={25}></IoCheckbox>) : (<IoCheckboxOutline size={25}></IoCheckboxOutline>)}
                 </button>
                 <button onClick={() => { handleDelete(lead.id) }} className="btn btn-square btn-ghost hover:text-red-500">
                     <IoTrash size={25}></IoTrash>
@@ -64,14 +82,17 @@ export default function LeadList() {
 
     return (
         <div className="w-2/3">
+            <div>
+                <LogoutButton />
+            </div>
             <ul className="h-full list bg-base-100 rounded-box shadow-md flex items-center">
                 <div className="w-full items-start"><h1 className="mt-4 ml-4 text-2xl">Leads</h1></div>
                 {leadList.length > 0 ?
                     <div className="w-full items-start">{renderLeadList}</div>
-                :
-                (
-                    <h1 className="justify-center ">Nenhum lead cadastrado</h1>
-                )}
+                    :
+                    (
+                        <h1 className="justify-center ">Nenhum lead cadastrado</h1>
+                    )}
 
             </ul>
         </div>

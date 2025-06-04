@@ -15,6 +15,7 @@ model Lead {
   email        String
   phone        String
   cpf          String
+  contacted    Boolean
   createdAt    DateTime          @default(now())
   billValue  String
   city       String

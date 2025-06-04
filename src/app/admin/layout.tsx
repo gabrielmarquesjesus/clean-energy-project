@@ -7,9 +7,6 @@ export default function RootLayout({
 }>) {
   return (
     <div className="h-screen flex items-center justify-center bg-gradient-to-r from-green-100 to-green-300">
-      <div>
-        <LogoutButton/>
-      </div>
       {children}
     </div>
   );

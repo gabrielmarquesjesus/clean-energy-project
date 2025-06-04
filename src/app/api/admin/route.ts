@@ -1,10 +1,7 @@
+import { ensureAdminExists } from "@/lib/initAdmin";
 import prisma from "@/lib/prisma";
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
 import { NextRequest, NextResponse } from "next/server";
-import { ensureAdminExists } from "@/lib/initAdmin";
-
-const AUTH_SECRET = process.env.AUTH_SECRET;
 
 export async function GET() {
   await ensureAdminExists();
@@ -15,10 +12,6 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   const { email, password } = await request.json();
 
-  if (!AUTH_SECRET) {
-    throw new Error("AUTH_SECRET não configurado");
-  }
-
   const admin = await prisma.admin.findFirst({ where: { email } });
 
   if (!admin || !(await bcrypt.compare(password, admin.password))) {
@@ -27,7 +20,6 @@ export async function POST(request: NextRequest) {
       { status: 401 }
     );
     
-    // Limpa qualquer cookie existente
     response.cookies.set({
       name: "session",
       value: "",
@@ -38,17 +30,15 @@ export async function POST(request: NextRequest) {
     return response;
   }
 
-  const token = jwt.sign({ id: admin.id }, AUTH_SECRET, { expiresIn: "7d" });
-
   const response = NextResponse.json({ ok: true });
   response.cookies.set({
     name: "session",
-    value: token,
+    value: admin.id ,
     path: "/",
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
-    maxAge: 60 * 60 * 24 * 7, // 7 dias
+    maxAge: 60 * 60 * 24 * 7,
   });
 
   return response;

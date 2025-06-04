@@ -1,5 +1,6 @@
 "use client";
 
+import Alert from "@/components/Alert";
 import { Admin } from "@/interfaces/Admin";
 import { useState } from "react";
 
@@ -8,8 +9,10 @@ export default function Login() {
     email: "",
     password: "",
   });
+  const [errorMessage, setErrorMessage] = useState("")
 
-  const handleLogin = () => {
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault()
     fetch("/api/admin", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -17,10 +20,9 @@ export default function Login() {
     })
       .then(async (response) => {
         if (response.ok) {
-          // Força navegação full server-side (com middleware e cookie disponível)
           window.location.href = "/admin/leads";
         } else if (response.status === 401) {
-          alert("Credenciais Inválidas");
+          setErrorMessage("Credenciais Inválidas");
         }
       })
       .catch((err) => {
@@ -35,7 +37,13 @@ export default function Login() {
   };
 
   return (
-    <div className="bg-white shadow-xl rounded-xl max-w-3xl w-full p-10 text-gray-800">
+    <form
+      onSubmit={handleLogin}
+      className="card w-[700px] bg-white shadow-xl rounded-xl max-w-3xl text-gray-800 p-6"
+    >
+      {errorMessage != "" && (
+        <Alert alertType="alert-error" onTimeouted={() => setErrorMessage("")} timeout={3000} onClick={() => setErrorMessage("")}>{errorMessage}</Alert>
+      )}
       <div className="flex justify-between">
         <h1 className="text-4xl font-bold mb-4 text-green-800">
           Clean Energy 🌱
@@ -46,7 +54,7 @@ export default function Login() {
       <div className="mb-4">
         <label className="block mb-1 text-sm font-extrabold">Email</label>
         <input
-          type="text"
+          type="email"
           name="email"
           value={form.email}
           onChange={handleChange}
@@ -67,12 +75,11 @@ export default function Login() {
 
       <div className="flex justify-center">
         <button
-          onClick={() => handleLogin()}
-          className="bg-green-600 hover:bg-green-700 transition-all duration-200 text-white text-lg font-semibold py-3 px-8 rounded-full shadow-md"
+          className="bg-green-600 hover:bg-green-700 transition-all duration-200 text-white text-lg font-semibold py-3 px-8 rounded-full shadow-md cursor-pointer"
         >
           Entrar
         </button>
       </div>
-    </div>
+    </form>
   );
 }

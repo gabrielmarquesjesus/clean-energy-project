@@ -5,7 +5,7 @@ export const LogoutButton = () => {
         fetch("/api/admin/logout", {
             method: "POST",
         }).then(() => {
-            window.location.href = "/";
+            window.location.href = "/admin/login";
         })
     };
     return (

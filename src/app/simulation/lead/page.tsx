@@ -1,5 +1,6 @@
 "use client";
 
+import Alert from "@/components/Alert";
 import { useSimulation } from "@/context/SimulationContext";
 import { Lead } from "@/interfaces/Lead";
 import { useRouter } from "next/navigation";
@@ -8,12 +9,15 @@ import { useEffect, useState } from "react";
 export default function LeadFormPage() {
     const router = useRouter();
     const { leadData, setLeadData } = useSimulation();
+    const [errorMessage, setErrorMessage] = useState("")
 
     const [form, setForm] = useState<Lead>({
+        id: leadData.id || "",
         name: leadData.name || "",
         email: leadData.email || "",
         phone: leadData.phone || "",
         cpf: leadData.cpf || "",
+        contacted: false,
         billValue: leadData.billValue || "",
         city: leadData.city || "",
         state: leadData.state || "",
@@ -41,16 +45,21 @@ export default function LeadFormPage() {
 
         const { name, email, phone, cpf } = form;
         if (!name || !email || !phone || !cpf) {
-            alert("Preencha todos os campos");
+            setErrorMessage("Preencha todos os campos!");
             return;
+        }
+
+        if (!validatePhone()) {
+            setErrorMessage("Por favor, insira um número de telefone válido e com DDD.");
+            return
         }
 
         setLeadData(form)
         router.push("/simulation/result")
-        fetch("/api/lead",{
+        fetch("/api/lead", {
             method: "POST",
-             headers: { "Content-Type": "application/json" },
-             body: JSON.stringify(form)
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(form)
         })
     };
 
@@ -59,8 +68,16 @@ export default function LeadFormPage() {
         router.push("/simulation")
     }
 
+    function validatePhone() {
+        const isValid = /^(\d{10}|\d{11})$/.test(form.phone.replace(/\D/g, ''));
+        return isValid
+    }
+
     return (
         <div>
+            {errorMessage != "" && (
+                <Alert alertType="alert-error" onTimeouted={() => setErrorMessage("")} timeout={3000} onClick={() => setErrorMessage("")}>{errorMessage}</Alert>
+            )}
             <form
                 onSubmit={handleSubmit}
                 className="card w-[700px] bg-white shadow-xl rounded-xl max-w-3xl text-gray-800 p-6"
@@ -75,7 +92,6 @@ export default function LeadFormPage() {
                         value={form.name}
                         onChange={handleChange}
                         className="w-full p-2 rounded bg-green-50 border border-green-300 focus:outline-none focus:ring focus:border-green-400"
-                        placeholder="Ex: Gabriel Cabide"
                     />
                 </div>
 
@@ -87,7 +103,6 @@ export default function LeadFormPage() {
                         value={form.email}
                         onChange={handleChange}
                         className="w-full p-2 rounded bg-green-50 border border-green-300 focus:outline-none focus:ring focus:border-green-400"
-                        placeholder="Ex: cabide@email.com"
                     />
                 </div>
 
@@ -99,8 +114,9 @@ export default function LeadFormPage() {
                         value={form.phone}
                         onChange={handleChange}
                         className="w-full p-2 rounded bg-green-50 border border-green-300 focus:outline-none focus:ring focus:border-green-400"
-                        placeholder="(11) 99999-9999"
+                        placeholder="Digite seu telefone"
                     />
+
                 </div>
 
                 <div className="mb-6">
@@ -112,6 +128,7 @@ export default function LeadFormPage() {
                         onChange={handleChange}
                         className="w-full p-2 rounded bg-green-50 border border-green-300 focus:outline-none focus:ring focus:border-green-400"
                         placeholder="123.456.789-00"
+                        pattern="\d{3}\.\d{3}\.\d{3}-\d{2}"
                     />
                 </div>
 

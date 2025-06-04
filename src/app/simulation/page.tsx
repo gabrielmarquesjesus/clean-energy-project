@@ -1,6 +1,7 @@
 // app/simulation/page.tsx
 "use client";
 
+import Alert from "@/components/Alert";
 import { useSimulation } from "@/context/SimulationContext";
 import { Lead } from "@/interfaces/Lead";
 import { useRouter } from "next/navigation";
@@ -9,11 +10,14 @@ import { useState } from "react";
 export default function ConsumptionForm() {
     const router = useRouter();
     const { leadData, setLeadData } = useSimulation()
+    const [errorMessage, setErrorMessage] = useState("")
     const [form, setForm] = useState<Lead>({
+        id: leadData.id || "",
         name: leadData.name || "",
         email: leadData.email || "",
         phone: leadData.phone || "",
         cpf: leadData.cpf || "",
+        contacted: false,
         billValue: leadData.billValue || "",
         city: leadData.city || "",
         state: leadData.state || "",
@@ -29,7 +33,7 @@ export default function ConsumptionForm() {
         e.preventDefault();
 
         if (!form.billValue || !form.city || !form.state || !form.supplyType) {
-            alert("Preencha todos os campos.");
+            setErrorMessage("Preencha todos os campos!")
             return;
         }
         setLeadData(form)
@@ -43,8 +47,11 @@ export default function ConsumptionForm() {
 
     return (
         <div>
+            {errorMessage != "" && (
+                <Alert alertType="alert-error" onTimeouted={() => setErrorMessage("")} timeout={3000} onClick={() => setErrorMessage("")}>{errorMessage}</Alert>
+            )}
             <form
-                onSubmit={(w) => handleSubmit(w)}
+                onSubmit={(e) => handleSubmit(e)}
                 className="card w-[700px] bg-white shadow-xl rounded-xl max-w-3xl text-gray-800 p-6"
             >
                 <h1 className="text-3xl font-semibold mb-6">Seus dados de consumo</h1>
@@ -55,6 +62,7 @@ export default function ConsumptionForm() {
                         type="number"
                         name="billValue"
                         value={form.billValue}
+                        min={0}
                         onChange={handleChange}
                         className="w-full p-2 rounded bg-green-50 border border-green-300 focus:outline-none focus:ring focus:border-green-400"
                         placeholder="Ex: 400"
