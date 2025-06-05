@@ -5,7 +5,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className="h-screen w-full flex justify-center p-10">
+    <div className="h-screen w-full flex justify-center p-10 overflow-hidden">
       {children}
     </div>
   );

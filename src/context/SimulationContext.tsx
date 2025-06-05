@@ -13,10 +13,12 @@ const SimulationContext = createContext<SimulationContextType | null>(null);
 export function SimulationProvider({ children }: { children: React.ReactNode }) {
 
     const [leadData, setLeadData] = useState<Lead>({
+        id: "",
         name: "",
         email: "",
         phone: "",
         cpf: "",
+        contacted: false,
         billValue: "",
         city: "",
         state: "",

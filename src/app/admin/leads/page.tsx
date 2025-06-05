@@ -42,8 +42,8 @@ export default function LeadList() {
         })
     }
 
-    const handleUpdate = (lead:Lead) => {
-        lead.contacted = !lead.contacted 
+    const handleUpdate = (lead: Lead) => {
+        lead.contacted = !lead.contacted
         fetch("/api/lead", {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
@@ -65,12 +65,12 @@ export default function LeadList() {
                 <div>{lead.name} - {lead.cpf}</div>
                 <div className="text-md font-semibold opacity-60">{lead.email} - {lead.phone}</div>
             </div>
-            <div className="w-[45%]">
+            <div className="w-[45%] px-10">
                 <div>{lead.city} - {lead.state.toUpperCase()}</div>
                 <div className="text-md font-semibold opacity-60">Fatura: R${Number(lead.billValue).toFixed(2)}</div>
             </div>
             <div className="w-[10%] flex justify-end">
-                <button data-tip="Contatado" className="btn btn-square btn-ghost tooltip tooltip-top" onClick={()=>handleUpdate(lead)}>
+                <button data-tip="Contatado" className="btn btn-square btn-ghost tooltip tooltip-top" onClick={() => handleUpdate(lead)}>
                     {lead.contacted ? (<IoCheckbox size={25}></IoCheckbox>) : (<IoCheckboxOutline size={25}></IoCheckboxOutline>)}
                 </button>
                 <button onClick={() => { handleDelete(lead.id) }} className="btn btn-square btn-ghost hover:text-red-500">
@@ -79,22 +79,19 @@ export default function LeadList() {
             </div>
         </li>
     );
-
     return (
-        <div className="w-2/3">
+        <div className="w-2/3  h-[600px] overflow-hidden">
             <div>
                 <LogoutButton />
             </div>
-            <ul className="h-full list bg-base-100 rounded-box shadow-md flex items-center">
-                <div className="w-full items-start"><h1 className="mt-4 ml-4 text-2xl">Leads</h1></div>
-                {leadList.length > 0 ?
-                    <div className="w-full items-start">{renderLeadList}</div>
-                    :
-                    (
-                        <h1 className="justify-center ">Nenhum lead cadastrado</h1>
-                    )}
-
+            <ul className="bg-base-100 rounded-box shadow-md overflow-y-auto h-[500px] space-y-8 p-4 flex-col justify-between">
+                {leadList.length > 0 ? (
+                    renderLeadList
+                ) : (
+                    <li className="text-center">Nenhum lead cadastrado</li>
+                )}
             </ul>
         </div>
-    )
+    );
+
 }

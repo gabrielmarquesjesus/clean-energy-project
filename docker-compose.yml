@@ -1,16 +1,19 @@
 services:
   postgres:
-    image: postgres
+    image: postgres:15-alpine
     ports:
       - "5433:5432"
     environment:
+      POSTGRES_USER: postgres
       POSTGRES_PASSWORD: cleanenergy
       POSTGRES_DB: cleanenergy
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "postgres"]
-      interval: 3s
+      test: ["CMD-SHELL", "pg_isready -U postgres -d cleanenergy"]
+      interval: 5s
       timeout: 5s
-      retries: 5
+      retries: 10
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
 
   app:
     build: .
@@ -18,11 +21,14 @@ services:
       postgres:
         condition: service_healthy
     environment:
-      DATABASE_URL: postgres://postgres:cleanenergy@postgres:5432/cleanenergy
+      DATABASE_URL: "postgres://postgres:cleanenergy@postgres:5432/cleanenergy"
     volumes:
       - .:/app
+      - /app/node_modules
     working_dir: /app
     ports:
       - "3000:3000"
-    command: ["sh", "-c", "npx prisma migrate dev --name init && npm run dev"]
+    command: ["sh", "-c", "npx prisma generate && npx prisma migrate deploy && npm run dev"]
 
+volumes:
+  postgres_data:
