@@ -1,36 +1,60 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+Aplicação construída inteiramente em Next.js com banco de dados PostgreSQL e containerizada usando Docker.
 
-## Getting Started
+## Iniciar o Projeto
 
-First, run the development server:
+### Requisitos
+
+- Docker
+- Docker Compose
+
+### 1. Criar .env
+
+Renomear o arquivo .env.example e alterar os valores.
+
+*Obs: Caso alterar o DATABASE_URL, altere as variáveis de ambiente do Postgres no docker-compose.yml*
+
+### 2. Suba os containers
+
+Na raiz do projeto, execute
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+docker-compose up -d
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 3. Acesse o projeto
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Estará disponível em `http://localhost:3000`
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 4. Criar usuário de administração
 
-## Learn More
+Basta acessar a rota `/api/admin` e o usuário padrão será criado.
 
-To learn more about Next.js, take a look at the following resources:
+## Guia da Aplicação
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Rotas Principais
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- `/` Tela de apresentação
+- `/simulation` Formulário para coletar dados de consumo do Lead
+- `/simulation/lead` Formulário para coletar dados pessoais do Lead
+- `/simulation/result` Exibição da economia de energia em 1, 3 e 5 anos.
+- `/api/admin` Cria um usuário de administração usando email e senha do .env
 
-## Deploy on Vercel
+### Estrutura principal do projeto
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+├── docker-compose.yml
+├── Dockerfile                # Define como a imagem do projeto deve ser construída
+├── prisma/                   # Contém as migrações e o schema do Prisma
+├── src/
+│   ├── app/                  # Páginas e APIs da aplicação
+│   │   ├── api/              # Rotas da API, lógica de negócios e consultas ao banco
+│   │   ├── admin/            # Páginas e componentes do painel administrativo
+│   │   └── simulation/       # Funcionalidades relacionadas a simulações
+│   ├── components/           # Componentes reutilizáveis da interface
+│   ├── context/              # Contextos para compartilhamento de estado entre componentes
+│   ├── interfaces/           # Definições de interfaces e tipos das entidades
+│   ├── lib/                  # Utilitários e configurações do Prisma
+│   ├── middleware.ts         # Middlewares globais da aplicação
+│   └── validation/           # Esquemas de validação com Zod para as entidades
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```
