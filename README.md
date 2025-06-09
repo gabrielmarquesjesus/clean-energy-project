@@ -38,6 +38,7 @@ Basta acessar a rota `/api/admin` e o usuário padrão será criado.
 - `/simulation/lead` Formulário para coletar dados pessoais do Lead
 - `/simulation/result` Exibição da economia de energia em 1, 3 e 5 anos.
 - `/api/admin` Cria um usuário de administração usando email e senha do .env
+- `/admin/login` Login para acesso a área administrativa
 
 ### Estrutura principal do projeto
 
